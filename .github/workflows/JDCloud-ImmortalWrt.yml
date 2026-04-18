@@ -61,8 +61,10 @@ jobs:
         VERSION_KERNEL=$(grep -oP 'LINUX_KERNEL_HASH-\K[0-9]+\.[0-9]+\.[0-9]+' target/linux/generic/kernel-6.12 || echo "6.12")
         echo "VERSION_KERNEL=$VERSION_KERNEL" >> $GITHUB_ENV
 
-    - name: Generate Variables(生成变量)
+    - name: Generate Variables
       run: |
+       # 设置 SOURCE_REPO、DEVICE_TARGET、DEVICE_SUBTARGET、HASH
+        echo "SOURCE_REPO=$SOURCE_REPO" >> $GITHUB_ENV
         cp $CONFIG_FILE $OPENWRT_PATH/.config
         cd $OPENWRT_PATH
         make defconfig > /dev/null 2>&1
@@ -78,8 +80,9 @@ jobs:
     - name: Cache Toolchain(缓存工具链)
       uses: actions/cache@main
       with:
-        key: ${{ env.SOURCE_REPO }}-${{ env.REPO_BRANCH }}-${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}-${{ env.HASH }} ${{ env.CACHE_DATE }}
-        restore-keys: ${{ env.SOURCE_REPO }}-${{ env.REPO_BRANCH }}-${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}-
+      key: ${{ env.SOURCE_REPO }}-${{ env.REPO_BRANCH }}-${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}-${{ env.HASH }}
+      restore-keys: |
+          ${{ env.SOURCE_REPO }}-${{ env.REPO_BRANCH }}-${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}-
         path: |
           ${{ env.OPENWRT_PATH }}/.ccache
           ${{ env.OPENWRT_PATH }}/staging_dir
@@ -128,7 +131,7 @@ jobs:
     - name: Organize Files(整理文件)
       if: steps.compile.outputs.status == 'success'
       run: |
-        cd $OPENWRT_PATH/bin/targets/*/*
+        cd $OPENWRT_PATH/bin/targets/*/* || exit 1
         cp $OPENWRT_PATH/.config Arthur.Athena.config
         mv config.buildinfo Arthur.Athena.config.buildinfo
         mv immortalwrt-qualcommax-ipq60xx.manifest Arthur.Athena.manifest
