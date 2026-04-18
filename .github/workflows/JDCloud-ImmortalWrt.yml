@@ -9,12 +9,6 @@ permissions:
 
 env:
   REPO_URL: https://github.com/laipeng668/immortalwrt.git
-  # ... 其余配置
-  # schedule:
-  #   - cron: 0 20 * * *
-
-env:
-  REPO_URL: https://github.com/laipeng668/immortalwrt.git
   REPO_BRANCH: master
   CONFIG_FILE: configs/JDCloud.config
   GENERAL_CONFIG_FILE: configs/General.config
