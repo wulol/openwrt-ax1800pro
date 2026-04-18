@@ -3,6 +3,13 @@ name: JDCloud-ImmortalWrt
 on:
   workflow_dispatch:
   workflow_call:
+
+permissions:
+  contents: write
+
+env:
+  REPO_URL: https://github.com/laipeng668/immortalwrt.git
+  # ... 其余配置
   # schedule:
   #   - cron: 0 20 * * *
 
