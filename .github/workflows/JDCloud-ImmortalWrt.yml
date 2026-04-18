@@ -63,7 +63,7 @@ jobs:
 
     - name: Generate Variables
       run: |
-       # 设置 SOURCE_REPO、DEVICE_TARGET、DEVICE_SUBTARGET、HASH
+        # 设置 SOURCE_REPO、DEVICE_TARGET、DEVICE_SUBTARGET、HASH
         echo "SOURCE_REPO=$SOURCE_REPO" >> $GITHUB_ENV
         cp $CONFIG_FILE $OPENWRT_PATH/.config
         cd $OPENWRT_PATH
@@ -80,8 +80,8 @@ jobs:
     - name: Cache Toolchain(缓存工具链)
       uses: actions/cache@main
       with:
-      key: ${{ env.SOURCE_REPO }}-${{ env.REPO_BRANCH }}-${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}-${{ env.HASH }}
-      restore-keys: |
+        key: ${{ env.SOURCE_REPO }}-${{ env.REPO_BRANCH }}-${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}-${{ env.HASH }}
+        restore-keys: |
           ${{ env.SOURCE_REPO }}-${{ env.REPO_BRANCH }}-${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}-
         path: |
           ${{ env.OPENWRT_PATH }}/.ccache
