@@ -65,28 +65,26 @@ git clone --depth=1 https://github.com/laipeng668/luci-app-gecoosac package/luci
 git clone --depth=1 https://github.com/NONGFAH/luci-app-athena-led package/luci-app-athena-led
 chmod +x package/luci-app-athena-led/root/etc/init.d/athena_led package/luci-app-athena-led/root/usr/sbin/athena-led
 
-### 代理插件：PassWall, OpenClash & Nikki ###
+### 代理插件：OpenClash & Nikki ###
 
-# 移除旧版核心与插件，防止依赖冲突
+# 移除 feeds 中可能存在的旧版代理相关包，防止依赖冲突
 rm -rf feeds/packages/net/{xray-core,v2ray-geodata,sing-box,chinadns-ng,dns2socks,hysteria,ipt2socks,microsocks,naiveproxy,shadowsocks-libev,shadowsocks-rust,shadowsocksr-libev,simple-obfs,tcping,trojan-plus,tuic-client,v2ray-plugin,xray-plugin,geoview,shadow-tls}
+rm -rf feeds/packages/net/{nikki,mihomo}
 rm -rf feeds/luci/applications/luci-app-passwall
 rm -rf feeds/luci/applications/luci-app-openclash
 rm -rf feeds/luci/applications/luci-app-nikki
 
-# 克隆 PassWall 及其依赖
-git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall-packages package/passwall-packages
-git clone --depth=1 https://github.com/Openwrt-Passwall/openwrt-passwall package/luci-app-passwall
+# 克隆 OpenClash (支持 YAML 配置文件导入，基于 Clash Meta 核心)
+git clone --depth=1 https://github.com/vernesong/OpenClash package/OpenClash
 
-# 克隆 OpenClash (支持 YAML 导入配置)
-git clone --depth=1 https://github.com/vernesong/OpenClash package/luci-app-openclash
+# 添加 Nikki Feed 源（包含 nikki + luci-app-nikki + mihomo 核心引擎）
+# nikki 基于 Mihomo Meta，支持 YAML 配置、现代协议与高效 nftables 分流
+if ! grep -q "nikki" feeds.conf.default 2>/dev/null; then
+  echo "src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki.git;main" >> feeds.conf.default
+fi
+./scripts/feeds update nikki
+./scripts/feeds install -a -p nikki
 
-# 克隆 Nikki (支持现代协议与高效分流)
-git clone --depth=1 https://github.com/immortalwrt-collections/luci-app-nikki package/luci-app-nikki
-
-# 清理 PassWall 规则文件
-echo "baidu.com" > package/luci-app-passwall/luci-app-passwall/root/usr/share/passwall/rules/chnlist
-
-# 更新并安装 Feeds
-./scripts/feeds update -a
+# 重新安装所有 Feeds 索引（不执行 update，避免覆盖已替换的 golang/frp 等包）
 ./scripts/feeds install -a
 
